@@ -65,7 +65,7 @@ revealElements.forEach(el => el.classList.add('reveal'));
 
 const revealOnScroll = () => {
     const windowHeight = window.innerHeight;
-    const elementVisible = 150;
+    const elementVisible = window.innerWidth <= 768 ? 80 : 150;
 
     revealElements.forEach(el => {
         const elementTop = el.getBoundingClientRect().top;
@@ -109,7 +109,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!track || !prevBtn || !nextBtn) return;
 
-    const CARD_WIDTH = 428; // 380px card + 48px margin (3rem)
+    let isMobile = window.innerWidth <= 768;
+    let CARD_WIDTH = isMobile ? 332 : 428; 
+
+    window.addEventListener('resize', () => {
+        isMobile = window.innerWidth <= 768;
+        CARD_WIDTH = isMobile ? 332 : 428;
+    });
     let currentOffset = 0;
     let isManual = false;
     let autoResumeTimer = null;
