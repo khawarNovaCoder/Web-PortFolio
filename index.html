@@ -183,8 +183,13 @@
         <div class="container">
             <h2 class="section-title">Featured <span class="gradient-text">Projects</span></h2>
 
-            <div class="projects-slider-container">
-                                <div class="projects-slider-track">
+            <div class="slider-wrapper">
+                <button class="slider-arrow slider-arrow-prev" id="sliderPrev" aria-label="Previous">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div class="projects-slider-container" id="sliderContainer">
+                    <div class="projects-slider-track" id="sliderTrack">
                     <!-- Project 1: ResumeForge -->
                     <article class="project-card" data-tilt>
                         <div class="project-img-wrapper">
@@ -577,6 +582,11 @@
                     </article>
                 </div>
             </div>
+
+                <button class="slider-arrow slider-arrow-next" id="sliderNext" aria-label="Next">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div><!-- /.slider-wrapper -->
         </div>
     </section>
 

@@ -36,20 +36,20 @@ function typeEffect() {
     if (isDeleting) {
         typingText.textContent = currentPhrase.substring(0, charIndex - 1);
         charIndex--;
-        typeSpeed = 50; // Faster when deleting
+        typeSpeed = 50;
     } else {
         typingText.textContent = currentPhrase.substring(0, charIndex + 1);
         charIndex++;
-        typeSpeed = 100; // Normal typing speed
+        typeSpeed = 100;
     }
 
     if (!isDeleting && charIndex === currentPhrase.length) {
         isDeleting = true;
-        typeSpeed = 2000; // Pause at end
+        typeSpeed = 2000;
     } else if (isDeleting && charIndex === 0) {
         isDeleting = false;
         phraseIndex = (phraseIndex + 1) % phrases.length;
-        typeSpeed = 500; // Pause slightly before typing next
+        typeSpeed = 500;
     }
 
     setTimeout(typeEffect, typeSpeed);
@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', typeEffect);
 // Scroll Reveal Animation
 const revealElements = document.querySelectorAll('.section-title, .about-text, .skill-category, .project-card, .timeline-item, .contact-card, .contact-form');
 
-// Add reveal class initially
 revealElements.forEach(el => el.classList.add('reveal'));
 
 const revealOnScroll = () => {
@@ -77,7 +76,6 @@ const revealOnScroll = () => {
 };
 
 window.addEventListener('scroll', revealOnScroll);
-// Trigger once on load
 revealOnScroll();
 
 // Active Navigation Link on Scroll
@@ -88,7 +86,6 @@ window.addEventListener('scroll', () => {
     let current = '';
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
         if (scrollY >= (sectionTop - 200)) {
             current = section.getAttribute('id');
         }
@@ -100,4 +97,76 @@ window.addEventListener('scroll', () => {
             li.classList.add('active');
         }
     });
+});
+
+// =========================================
+// PROJECT SLIDER ARROW NAVIGATION
+// =========================================
+document.addEventListener('DOMContentLoaded', function () {
+    const track = document.getElementById('sliderTrack');
+    const prevBtn = document.getElementById('sliderPrev');
+    const nextBtn = document.getElementById('sliderNext');
+
+    if (!track || !prevBtn || !nextBtn) return;
+
+    const CARD_WIDTH = 428; // 380px card + 48px margin (3rem)
+    let currentOffset = 0;
+    let isManual = false;
+    let autoResumeTimer = null;
+
+    function enterManualMode() {
+        if (isManual) return;
+        isManual = true;
+
+        // Read current animated position from computed transform matrix
+        const matrix = window.getComputedStyle(track).transform;
+        if (matrix && matrix !== 'none') {
+            const vals = matrix.match(/matrix.*\((.+)\)/);
+            if (vals) {
+                const parts = vals[1].split(', ');
+                currentOffset = Math.abs(parseFloat(parts[4]) || 0);
+            }
+        }
+
+        // Kill CSS animation, hold position
+        track.style.animation = 'none';
+        track.style.transition = 'none';
+        track.style.transform = `translateX(-${currentOffset}px)`;
+
+        // Enable smooth transition for next movement
+        requestAnimationFrame(() => {
+            track.style.transition = 'transform 0.45s cubic-bezier(0.25, 0.8, 0.25, 1)';
+        });
+    }
+
+    function resumeAuto() {
+        isManual = false;
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(0)';
+        setTimeout(() => {
+            track.style.animation = '';
+            track.style.transform = '';
+            track.style.transition = '';
+        }, 60);
+    }
+
+    function slide(direction) {
+        enterManualMode();
+
+        const halfWidth = track.scrollWidth / 2;
+        currentOffset += direction * CARD_WIDTH;
+
+        // Wrap around
+        if (currentOffset < 0) currentOffset = halfWidth + currentOffset;
+        if (currentOffset >= halfWidth) currentOffset = currentOffset - halfWidth;
+
+        track.style.transform = `translateX(-${currentOffset}px)`;
+
+        // Auto-resume after 3 seconds of no clicks
+        clearTimeout(autoResumeTimer);
+        autoResumeTimer = setTimeout(resumeAuto, 3000);
+    }
+
+    prevBtn.addEventListener('click', () => slide(-1));
+    nextBtn.addEventListener('click', () => slide(1));
 });
